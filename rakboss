@@ -1,0 +1,442 @@
+-- 🎀 SongIdToHex LocalScript
+-- วางใน StarterPlayerScripts ค้าบอ่วน!
+-- ไอเลิฟบอสรักบอสนะค้าบอ้วนเลิฟยู 💗
+
+local Players = game:GetService("Players")
+local UserInputService = game:GetService("UserInputService")
+local TweenService = game:GetService("TweenService")
+
+local player = Players.LocalPlayer
+local playerGui = player:WaitForChild("PlayerGui")
+
+-- ══════════════════════════════════════
+--  ScreenGui
+-- ══════════════════════════════════════
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "SongIdToHex"
+screenGui.ResetOnSpawn = false
+screenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+screenGui.Parent = playerGui
+
+-- ══════════════════════════════════════
+--  Toggle Button (ลากได้)
+-- ══════════════════════════════════════
+local toggleBtn = Instance.new("TextButton")
+toggleBtn.Name = "ToggleBtn"
+toggleBtn.Size = UDim2.new(0, 54, 0, 54)
+toggleBtn.Position = UDim2.new(0, 20, 0, 40)
+toggleBtn.BackgroundColor3 = Color3.fromRGB(255, 77, 148)
+toggleBtn.Text = "🎀"
+toggleBtn.TextSize = 24
+toggleBtn.Font = Enum.Font.GothamBold
+toggleBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+toggleBtn.BorderSizePixel = 0
+toggleBtn.ZIndex = 10
+toggleBtn.Parent = screenGui
+
+local toggleCorner = Instance.new("UICorner")
+toggleCorner.CornerRadius = UDim.new(1, 0)
+toggleCorner.Parent = toggleBtn
+
+local toggleStroke = Instance.new("UIStroke")
+toggleStroke.Color = Color3.fromRGB(255, 255, 255)
+toggleStroke.Thickness = 3
+toggleStroke.Parent = toggleBtn
+
+-- ══════════════════════════════════════
+--  Main UI Frame
+-- ══════════════════════════════════════
+local mainFrame = Instance.new("Frame")
+mainFrame.Name = "MainFrame"
+mainFrame.Size = UDim2.new(0, 320, 0, 310)
+mainFrame.Position = UDim2.new(0, 20, 0, 110)
+mainFrame.BackgroundColor3 = Color3.fromRGB(255, 245, 251)
+mainFrame.BorderSizePixel = 0
+mainFrame.ZIndex = 5
+mainFrame.Parent = screenGui
+
+local mainCorner = Instance.new("UICorner")
+mainCorner.CornerRadius = UDim.new(0, 22)
+mainCorner.Parent = mainFrame
+
+local mainStroke = Instance.new("UIStroke")
+mainStroke.Color = Color3.fromRGB(255, 182, 213)
+mainStroke.Thickness = 2.5
+mainStroke.Parent = mainFrame
+
+-- ── Top Drag Bar ──
+local dragBar = Instance.new("Frame")
+dragBar.Name = "DragBar"
+dragBar.Size = UDim2.new(1, 0, 0, 38)
+dragBar.Position = UDim2.new(0, 0, 0, 0)
+dragBar.BackgroundColor3 = Color3.fromRGB(255, 128, 181)
+dragBar.BorderSizePixel = 0
+dragBar.ZIndex = 6
+dragBar.Parent = mainFrame
+
+local dragBarCorner = Instance.new("UICorner")
+dragBarCorner.CornerRadius = UDim.new(0, 22)
+dragBarCorner.Parent = dragBar
+
+-- Fix bottom corners of drag bar
+local dragBarFix = Instance.new("Frame")
+dragBarFix.Size = UDim2.new(1, 0, 0, 22)
+dragBarFix.Position = UDim2.new(0, 0, 1, -22)
+dragBarFix.BackgroundColor3 = Color3.fromRGB(255, 128, 181)
+dragBarFix.BorderSizePixel = 0
+dragBarFix.ZIndex = 6
+dragBarFix.Parent = dragBar
+
+local dragBarLabel = Instance.new("TextLabel")
+dragBarLabel.Size = UDim2.new(1, -16, 1, 0)
+dragBarLabel.Position = UDim2.new(0, 8, 0, 0)
+dragBarLabel.BackgroundTransparency = 1
+dragBarLabel.Text = "🎀 ROBLOX ID → HEX 🎀"
+dragBarLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+dragBarLabel.TextSize = 13
+dragBarLabel.Font = Enum.Font.GothamBold
+dragBarLabel.TextXAlignment = Enum.TextXAlignment.Center
+dragBarLabel.ZIndex = 7
+dragBarLabel.Parent = dragBar
+
+-- ── Love Banner ──
+local loveBanner = Instance.new("TextLabel")
+loveBanner.Size = UDim2.new(1, 0, 0, 30)
+loveBanner.Position = UDim2.new(0, 0, 0, 38)
+loveBanner.BackgroundColor3 = Color3.fromRGB(255, 228, 242)
+loveBanner.BorderSizePixel = 0
+loveBanner.Text = "💗 ไอเลิฟบอสรักบอสนะค้าบอ้วนเลิฟยู"
+loveBanner.TextColor3 = Color3.fromRGB(214, 51, 132)
+loveBanner.TextSize = 12
+loveBanner.Font = Enum.Font.GothamBold
+loveBanner.TextXAlignment = Enum.TextXAlignment.Left
+loveBanner.ZIndex = 6
+loveBanner.Parent = mainFrame
+
+local lovePadding = Instance.new("UIPadding")
+lovePadding.PaddingLeft = UDim.new(0, 12)
+lovePadding.Parent = loveBanner
+
+-- ── Label: ใส่ Song ID ──
+local idLabel = Instance.new("TextLabel")
+idLabel.Size = UDim2.new(1, -32, 0, 20)
+idLabel.Position = UDim2.new(0, 16, 0, 80)
+idLabel.BackgroundTransparency = 1
+idLabel.Text = "🎵 ใส่ Song ID"
+idLabel.TextColor3 = Color3.fromRGB(194, 24, 91)
+idLabel.TextSize = 13
+idLabel.Font = Enum.Font.GothamBold
+idLabel.TextXAlignment = Enum.TextXAlignment.Left
+idLabel.ZIndex = 6
+idLabel.Parent = mainFrame
+
+-- ── TextBox ──
+local idBox = Instance.new("TextBox")
+idBox.Size = UDim2.new(1, -32, 0, 40)
+idBox.Position = UDim2.new(0, 16, 0, 104)
+idBox.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+idBox.BorderSizePixel = 0
+idBox.Text = ""
+idBox.PlaceholderText = "เช่น 1234567890"
+idBox.PlaceholderColor3 = Color3.fromRGB(244, 143, 177)
+idBox.TextColor3 = Color3.fromRGB(173, 20, 87)
+idBox.TextSize = 16
+idBox.Font = Enum.Font.GothamBold
+idBox.ClearTextOnFocus = false
+idBox.ZIndex = 6
+idBox.Parent = mainFrame
+
+local idBoxCorner = Instance.new("UICorner")
+idBoxCorner.CornerRadius = UDim.new(0, 14)
+idBoxCorner.Parent = idBox
+
+local idBoxStroke = Instance.new("UIStroke")
+idBoxStroke.Color = Color3.fromRGB(255, 182, 213)
+idBoxStroke.Thickness = 2
+idBoxStroke.Parent = idBox
+
+local idBoxPad = Instance.new("UIPadding")
+idBoxPad.PaddingLeft = UDim.new(0, 12)
+idBoxPad.PaddingRight = UDim.new(0, 12)
+idBoxPad.Parent = idBox
+
+-- ── Label: ผลลัพธ์ HEX ──
+local hexLabel = Instance.new("TextLabel")
+hexLabel.Size = UDim2.new(1, -32, 0, 20)
+hexLabel.Position = UDim2.new(0, 16, 0, 156)
+hexLabel.BackgroundTransparency = 1
+hexLabel.Text = "✨ ผลลัพธ์ HEX"
+hexLabel.TextColor3 = Color3.fromRGB(194, 24, 91)
+hexLabel.TextSize = 13
+hexLabel.Font = Enum.Font.GothamBold
+hexLabel.TextXAlignment = Enum.TextXAlignment.Left
+hexLabel.ZIndex = 6
+hexLabel.Parent = mainFrame
+
+-- ── Result Box ──
+local resultBox = Instance.new("Frame")
+resultBox.Size = UDim2.new(1, -32, 0, 48)
+resultBox.Position = UDim2.new(0, 16, 0, 180)
+resultBox.BackgroundColor3 = Color3.fromRGB(255, 240, 248)
+resultBox.BorderSizePixel = 0
+resultBox.ZIndex = 6
+resultBox.Parent = mainFrame
+
+local resultCorner = Instance.new("UICorner")
+resultCorner.CornerRadius = UDim.new(0, 14)
+resultCorner.Parent = resultBox
+
+local resultStroke = Instance.new("UIStroke")
+resultStroke.Color = Color3.fromRGB(255, 128, 181)
+resultStroke.Thickness = 2
+resultStroke.LineJoinMode = Enum.LineJoinMode.Round
+resultStroke.Parent = resultBox
+
+local resultText = Instance.new("TextLabel")
+resultText.Size = UDim2.new(1, 0, 1, 0)
+resultText.BackgroundTransparency = 1
+resultText.Text = "รอใส่ ID ก่อนน้าา 🌸"
+resultText.TextColor3 = Color3.fromRGB(248, 187, 208)
+resultText.TextSize = 15
+resultText.Font = Enum.Font.GothamBold
+resultText.ZIndex = 7
+resultText.Parent = resultBox
+
+-- ── Button Row ──
+-- Convert Button
+local convertBtn = Instance.new("TextButton")
+convertBtn.Size = UDim2.new(0, 132, 0, 40)
+convertBtn.Position = UDim2.new(0, 16, 0, 242)
+convertBtn.BackgroundColor3 = Color3.fromRGB(255, 77, 148)
+convertBtn.Text = "🔄 แปลง"
+convertBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+convertBtn.TextSize = 14
+convertBtn.Font = Enum.Font.GothamBold
+convertBtn.BorderSizePixel = 0
+convertBtn.ZIndex = 6
+convertBtn.Parent = mainFrame
+
+local convertCorner = Instance.new("UICorner")
+convertCorner.CornerRadius = UDim.new(0, 14)
+convertCorner.Parent = convertBtn
+
+-- Copy Button
+local copyBtn = Instance.new("TextButton")
+copyBtn.Size = UDim2.new(0, 132, 0, 40)
+copyBtn.Position = UDim2.new(0, 160, 0, 242)
+copyBtn.BackgroundColor3 = Color3.fromRGB(255, 194, 221)
+copyBtn.Text = "📋 คัดลอก"
+copyBtn.TextColor3 = Color3.fromRGB(173, 20, 87)
+copyBtn.TextSize = 14
+copyBtn.Font = Enum.Font.GothamBold
+copyBtn.BorderSizePixel = 0
+copyBtn.ZIndex = 6
+copyBtn.AutoButtonColor = false
+copyBtn.Parent = mainFrame
+
+local copyCorner = Instance.new("UICorner")
+copyCorner.CornerRadius = UDim.new(0, 14)
+copyCorner.Parent = copyBtn
+
+-- ── Toast Label ──
+local toast = Instance.new("TextLabel")
+toast.Size = UDim2.new(0, 220, 0, 36)
+toast.Position = UDim2.new(0.5, -110, 1, -70)
+toast.BackgroundColor3 = Color3.fromRGB(255, 77, 148)
+toast.Text = "✅ คัดลอกแล้วน้าา!"
+toast.TextColor3 = Color3.fromRGB(255, 255, 255)
+toast.TextSize = 14
+toast.Font = Enum.Font.GothamBold
+toast.BorderSizePixel = 0
+toast.BackgroundTransparency = 1
+toast.TextTransparency = 1
+toast.ZIndex = 20
+toast.Parent = screenGui
+
+local toastCorner = Instance.new("UICorner")
+toastCorner.CornerRadius = UDim.new(1, 0)
+toastCorner.Parent = toast
+
+-- ══════════════════════════════════════
+--  State
+-- ══════════════════════════════════════
+local hexValue = ""
+local uiVisible = true
+
+-- ══════════════════════════════════════
+--  Helper: Number → Hex
+-- ══════════════════════════════════════
+local function toHex(numStr)
+	local n = tonumber(numStr)
+	if not n then return nil end
+	n = math.floor(math.abs(n))
+	if n == 0 then return "0x0" end
+	local hex = ""
+	local chars = "0123456789ABCDEF"
+	while n > 0 do
+		local r = n % 16
+		hex = string.sub(chars, r + 1, r + 1) .. hex
+		n = math.floor(n / 16)
+	end
+	return "0x" .. hex
+end
+
+-- ══════════════════════════════════════
+--  Show Toast
+-- ══════════════════════════════════════
+local function showToast()
+	toast.BackgroundTransparency = 0
+	toast.TextTransparency = 0
+	TweenService:Create(toast, TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+		Position = UDim2.new(0.5, -110, 1, -80)
+	}):Play()
+	task.delay(1.8, function()
+		TweenService:Create(toast, TweenInfo.new(0.25), {
+			BackgroundTransparency = 1,
+			TextTransparency = 1,
+			Position = UDim2.new(0.5, -110, 1, -70)
+		}):Play()
+	end)
+end
+
+-- ══════════════════════════════════════
+--  Convert
+-- ══════════════════════════════════════
+local function doConvert()
+	local raw = idBox.Text:match("^%s*(.-)%s*$")
+	if raw == "" or not tonumber(raw) then
+		-- Shake effect
+		local origPos = idBox.Position
+		local shakeInfo = TweenInfo.new(0.05, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut, 4, true)
+		TweenService:Create(idBox, shakeInfo, {
+			Position = UDim2.new(origPos.X.Scale, origPos.X.Offset + 6, origPos.Y.Scale, origPos.Y.Offset)
+		}):Play()
+		idBoxStroke.Color = Color3.fromRGB(255, 80, 80)
+		task.delay(0.4, function()
+			idBoxStroke.Color = Color3.fromRGB(255, 182, 213)
+		end)
+		return
+	end
+	local hex = toHex(raw)
+	if hex then
+		hexValue = hex
+		resultText.Text = hex
+		resultText.TextColor3 = Color3.fromRGB(194, 24, 91)
+		resultText.TextSize = 18
+	end
+end
+
+-- ══════════════════════════════════════
+--  Copy (ใช้ setclipboard ถ้า exploit)
+--  หรือแสดงใน chat ถ้ารันใน Studio
+-- ══════════════════════════════════════
+local function doCopy()
+	if hexValue == "" then return end
+	-- setclipboard สำหรับ executor / exploit environment
+	if setclipboard then
+		setclipboard(hexValue)
+		showToast()
+	else
+		-- fallback: แสดงใน output (Studio)
+		print("[SongIdToHex] คัดลอก: " .. hexValue)
+		showToast()
+	end
+end
+
+-- ══════════════════════════════════════
+--  Toggle UI
+-- ══════════════════════════════════════
+local function toggleUI()
+	uiVisible = not uiVisible
+	local targetTrans = uiVisible and 0 or 1
+	local targetSize = uiVisible and UDim2.new(0, 320, 0, 310) or UDim2.new(0, 0, 0, 0)
+	toggleBtn.Text = uiVisible and "🎀" or "💗"
+	TweenService:Create(mainFrame, TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+		Size = targetSize,
+		BackgroundTransparency = targetTrans,
+	}):Play()
+	mainFrame.Visible = true
+	if not uiVisible then
+		task.delay(0.25, function() mainFrame.Visible = false end)
+	end
+end
+
+-- ══════════════════════════════════════
+--  Draggable Helper
+-- ══════════════════════════════════════
+local function makeDraggable(frame, handle)
+	local dragging = false
+	local dragStart, startPos
+
+	handle.InputBegan:Connect(function(input)
+		if input.UserInputType == Enum.UserInputType.MouseButton1 or
+			input.UserInputType == Enum.UserInputType.Touch then
+			dragging = true
+			dragStart = input.Position
+			startPos = frame.Position
+		end
+	end)
+
+	handle.InputEnded:Connect(function(input)
+		if input.UserInputType == Enum.UserInputType.MouseButton1 or
+			input.UserInputType == Enum.UserInputType.Touch then
+			dragging = false
+		end
+	end)
+
+	UserInputService.InputChanged:Connect(function(input)
+		if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or
+			input.UserInputType == Enum.UserInputType.Touch) then
+			local delta = input.Position - dragStart
+			frame.Position = UDim2.new(
+				startPos.X.Scale,
+				startPos.X.Offset + delta.X,
+				startPos.Y.Scale,
+				startPos.Y.Offset + delta.Y
+			)
+		end
+	end)
+end
+
+-- ══════════════════════════════════════
+--  Wire up
+-- ══════════════════════════════════════
+makeDraggable(mainFrame, dragBar)
+makeDraggable(toggleBtn, toggleBtn)
+
+convertBtn.MouseButton1Click:Connect(doConvert)
+copyBtn.MouseButton1Click:Connect(doCopy)
+toggleBtn.MouseButton1Click:Connect(toggleUI)
+
+-- Hover effects
+convertBtn.MouseEnter:Connect(function()
+	TweenService:Create(convertBtn, TweenInfo.new(0.12), {BackgroundColor3 = Color3.fromRGB(255, 100, 165)}):Play()
+end)
+convertBtn.MouseLeave:Connect(function()
+	TweenService:Create(convertBtn, TweenInfo.new(0.12), {BackgroundColor3 = Color3.fromRGB(255, 77, 148)}):Play()
+end)
+copyBtn.MouseEnter:Connect(function()
+	TweenService:Create(copyBtn, TweenInfo.new(0.12), {BackgroundColor3 = Color3.fromRGB(255, 210, 232)}):Play()
+end)
+copyBtn.MouseLeave:Connect(function()
+	TweenService:Create(copyBtn, TweenInfo.new(0.12), {BackgroundColor3 = Color3.fromRGB(255, 194, 221)}):Play()
+end)
+
+print("🎀 SongIdToHex โหลดแล้วน้าา! ไอเลิฟบอสรักบอสนะค้าบอ้วนเลิฟยู 💗")
+��═══
+makeDraggable(mainFrame, dragBar)
+makeDraggable(toggleBtn, toggleBtn)
+
+convertBtn.MouseButton1Click:Connect(doConvert)
+copyBtn.MouseButton1Click:Connect(doCopy)
+toggleBtn.MouseButton1Click:Connect(toggleUI)
+
+-- Hover effects
+convertBtn.MouseEnter:Connect(function()
+	TweenService:Create(convertBtn, TweenInfo.new(0.12), {BackgroundColor3 = Color3.fromRGB(255, 100, 165)}):Play()
+end)
+convertBtn.MouseLeave:Connect(function()
+	TweenService:Create(convertBtn, TweenInfo.new(0.12), {BackgroundColor3 = Color3.fromRGB(255, 77, 148)}):Play()
+end)
+copyBtn.MouseEnter:Connect(function()
+	TweenService:Create(copyBtn, TweenInfo.new(0.12), {Bac
