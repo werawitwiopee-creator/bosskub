@@ -597,4 +597,4 @@ async def remove_artist(ctx, *, name: str = None):
         ))
 
 
-bot.run(TOKEN)
+bot.run("MTUzMDc5MTY4MDEyOTYzNDM1NA.GKRTqj.BPR6ZuowKeaNydDH6g36suXuh979XmVZRfGgcY")
