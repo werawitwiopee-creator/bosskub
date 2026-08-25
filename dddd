@@ -1,0 +1,370 @@
+-- สคิปของ 191 ค้าบเบบี๋
+-- LocalScript ใส่ใน StarterPlayerScripts
+
+local Players = game:GetService("\80\108\97\121\101\114\115")
+local TweenService = game:GetService("\84\119\101\101\110\83\101\114\118\105\99\101")
+local UserInputService = game:GetService("\85\115\101\114\73\110\112\117\116\83\101\114\118\105\99\101")
+local HttpService = game:GetService("\72\116\116\112\83\101\114\118\105\99\101")
+local MarketplaceService = game:GetService("\77\97\114\107\101\116\112\108\97\99\101\83\101\114\118\105\99\101")
+local player = Players.LocalPlayer
+
+-- ===============================
+-- Remotes
+-- ===============================
+local D = {}
+D[2]  = "\82\101\112\108\105\99\97\116\101\100\83\116\111\114\97\103\101"
+D[3]  = "\82\69"
+D[4]  = "\49\78\111\77\111\116\111\49\114\86\101\104\105\99\108\101\49\115"
+D[6]  = "\80\108\97\121\101\114\115"
+D[7]  = "\80\108\97\121\101\114\71\117\105"
+D[9]  = "\84\119\101\101\110\83\101\114\118\105\99\101"
+D[10] = "\85\115\101\114\73\110\112\117\116\83\101\114\118\105\99\101"
+D[11] = "\83\107\97\116\101\66\111\97\114\100"
+D[13] = "\80\105\99\107\105\110\103\83\99\111\111\116\101\114\77\117\115\105\99\84\101\120\116"
+D[14] = "\80\108\97\121\101\114\84\111\111\108\69\118\101\110\116"
+D[15] = "\84\111\111\108\77\117\115\105\99\84\101\120\116"
+
+local _rs = game:GetService(D[2])
+local _reV = _rs:WaitForChild(D[3]):WaitForChild(D[4])
+local _reB = _rs:WaitForChild(D[3]):WaitForChild(D[14])
+
+-- ===============================
+-- Junk Prefix + Suffix
+-- ===============================
+local _JUNK_PREFIX = "83260119948695& \n [[191]] &%69=00"
+local _JUNK_SUFFIX = "&junk=1"
+
+-- ===============================
+-- URL Encode
+-- ===============================
+local function _urlEncode(id)
+    local _hx = "0123456789ABCDEF"
+    local r = ""
+    for i = 1, #id do
+        local b = string.byte(id, i)
+        r = r .. "%" .. string.sub(_hx, math.floor(b/16)+1, math.floor(b/16)+1) .. string.sub(_hx, (b%16)+1, (b%16)+1)
+    end
+    return r
+end
+
+-- ===============================
+-- สร้าง payload = junk prefix + urlencode(id) + junk suffix
+-- ===============================
+local function _buildPayload(rawId)
+    return _JUNK_PREFIX .. _urlEncode(rawId) .. _JUNK_SUFFIX
+end
+
+-- ===============================
+-- ScreenGui
+-- ===============================
+local _g = Instance.new("\83\99\114\101\101\110\71\117\105")
+_g.Name = "\77\117\115\105\99\80\97\110\101\108"
+_g.ResetOnSpawn = false
+_g.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+_g.Parent = player[D[7]]
+
+-- ===============================
+-- Toggle Button (ปุ่มเปิด GUI) — เริ่มกลางจอ + ลากได้
+-- ===============================
+local _tg = Instance.new("ImageButton")
+_tg.Size = UDim2.new(0, 65, 0, 65)
+_tg.Position = UDim2.new(0.5, -32, 0.5, -32)
+_tg.BackgroundColor3 = Color3.fromRGB(10, 10, 22)
+_tg.Image = "rbxassetid://11104447788"
+_tg.BorderSizePixel = 0
+_tg.ZIndex = 10
+_tg.Parent = _g
+Instance.new("UICorner", _tg).CornerRadius = UDim.new(1, 0)
+local _tgs = Instance.new("UIStroke", _tg)
+_tgs.Color = Color3.fromRGB(25, 25, 55)
+_tgs.Thickness = 1.5
+
+-- Tag (อยู่ใน Frame ล่างสุด)
+local _tag = Instance.new("\84\101\120\116\76\97\98\101\108")
+_tag.Size = UDim2.new(1,-24,0,14)
+_tag.Position = UDim2.new(0,12,0,194)
+_tag.BackgroundTransparency = 1
+_tag.Text = "\224\184\170\224\184\179\224\184\171\224\184\163\224\184\177\224\184\154\32\224\184\161\224\184\177\224\185\136\224\184\135\32\224\184\174\224\184\173\224\184\165\32\224\184\154\224\184\173\224\184\170\32\224\185\130\224\184\153\224\185\136\32\124\32\224\185\131\224\184\132\224\184\163\224\184\151\224\184\181\224\185\136\224\185\132\224\184\161\224\185\136\224\185\132\224\184\148\224\185\137\224\184\138\224\184\183\224\185\136\224\184\173\224\184\173\224\184\162\224\184\185\224\185\136\224\185\131\224\184\153\224\184\153\224\184\181\224\185\137\224\184\132\224\184\183\224\184\173\224\185\128\224\184\170\224\184\163\224\185\136\224\184\173\224\185\132\224\184\173\224\184\132\224\184\167\224\184\178\224\184\162\224\184\170\224\184\161\224\185\128\224\184\158\224\184\139\224\184\161\224\184\178\224\184\130\224\185\130\224\184\161\224\184\162\224\184\170\224\184\132\224\184\180\224\184\155\224\185\132\224\184\155\224\185\131\224\184\138\224\185\137\224\184\171\224\184\153\224\185\137\224\184\178\224\184\148\224\185\137\224\184\178\224\184\153\224\185\134\224\185\132\224\184\173\224\185\130\224\184\135\224\185\136"
+_tag.TextColor3 = Color3.fromRGB(40,40,70)
+_tag.TextSize = 8
+_tag.Font = Enum.Font.Code
+_tag.TextXAlignment = Enum.TextXAlignment.Left
+_tag.TextTruncate = Enum.TextTruncate.AtEnd
+
+-- Main Frame (ซ่อนก่อนตอนเริ่ม)
+local _fr = Instance.new("\70\114\97\109\101")
+_fr.Size = UDim2.new(0,300,0,220)
+_fr.Position = UDim2.new(0.5,-150,0.5,-105)
+_fr.BackgroundColor3 = Color3.fromRGB(8,8,16)
+_fr.BorderSizePixel = 0
+_fr.Active = true
+_fr.Visible = false
+_fr.Parent = _g
+Instance.new("\85\73\67\111\114\110\101\114",_fr).CornerRadius = UDim.new(0,12)
+local _frs = Instance.new("\85\73\83\116\114\111\107\101",_fr)
+_frs.Color = Color3.fromRGB(25,25,55)
+_frs.Thickness = 1.5
+
+-- Title Bar
+local _tb = Instance.new("\70\114\97\109\101",_fr)
+_tb.Size = UDim2.new(1,0,0,44)
+_tb.BackgroundColor3 = Color3.fromRGB(10,10,20)
+_tb.BorderSizePixel = 0
+Instance.new("\85\73\67\111\114\110\101\114",_tb).CornerRadius = UDim.new(0,12)
+local _tbf = Instance.new("\70\114\97\109\101",_tb)
+_tbf.Size = UDim2.new(1,0,0.5,0)
+_tbf.Position = UDim2.new(0,0,0.5,0)
+_tbf.BackgroundColor3 = Color3.fromRGB(10,10,20)
+_tbf.BorderSizePixel = 0
+
+-- Dots
+local _dot1 = Instance.new("\70\114\97\109\101",_tb)
+_dot1.Size = UDim2.new(0,8,0,8)
+_dot1.Position = UDim2.new(0,12,0.5,-4)
+_dot1.BackgroundColor3 = Color3.fromRGB(255,60,60)
+_dot1.BorderSizePixel = 0
+Instance.new("\85\73\67\111\114\110\101\114",_dot1).CornerRadius = UDim.new(1,0)
+
+local _dot2 = Instance.new("\70\114\97\109\101",_tb)
+_dot2.Size = UDim2.new(0,8,0,8)
+_dot2.Position = UDim2.new(0,26,0.5,-4)
+_dot2.BackgroundColor3 = Color3.fromRGB(255,170,0)
+_dot2.BorderSizePixel = 0
+Instance.new("\85\73\67\111\114\110\101\114",_dot2).CornerRadius = UDim.new(1,0)
+
+local _dot3 = Instance.new("\70\114\97\109\101",_tb)
+_dot3.Size = UDim2.new(0,8,0,8)
+_dot3.Position = UDim2.new(0,40,0.5,-4)
+_dot3.BackgroundColor3 = Color3.fromRGB(0,200,80)
+_dot3.BorderSizePixel = 0
+Instance.new("\85\73\67\111\114\110\101\114",_dot3).CornerRadius = UDim.new(1,0)
+
+local _tt = Instance.new("\84\101\120\116\76\97\98\101\108",_tb)
+_tt.Size = UDim2.new(1,-80,1,0)
+_tt.Position = UDim2.new(0,60,0,0)
+_tt.BackgroundTransparency = 1
+_tt.Text = "MUSIC // 191"
+_tt.TextColor3 = Color3.fromRGB(80,80,160)
+_tt.TextSize = 13
+_tt.Font = Enum.Font.Code
+_tt.TextXAlignment = Enum.TextXAlignment.Left
+
+-- Close Button
+local _cb = Instance.new("\84\101\120\116\66\117\116\116\111\110", _tb)
+_cb.Size = UDim2.new(0, 24, 0, 24)
+_cb.Position = UDim2.new(1, -32, 0.5, -12)
+_cb.BackgroundColor3 = Color3.fromRGB(15, 15, 30)
+_cb.Text = "✕"
+_cb.TextColor3 = Color3.fromRGB(80, 80, 120)
+_cb.TextSize = 12
+_cb.Font = Enum.Font.GothamBold
+_cb.BorderSizePixel = 0
+Instance.new("\85\73\67\111\114\110\101\114", _cb).CornerRadius = UDim.new(0, 6)
+local _cbs = Instance.new("\85\73\83\116\114\111\107\101", _cb)
+_cbs.Color = Color3.fromRGB(40, 40, 80)
+_cbs.Thickness = 1
+
+-- Song Name
+local _sl = Instance.new("\84\101\120\116\76\97\98\101\108",_fr)
+_sl.Size = UDim2.new(1,-24,0,28)
+_sl.Position = UDim2.new(0,12,0,52)
+_sl.BackgroundColor3 = Color3.fromRGB(5,5,12)
+_sl.BorderSizePixel = 0
+_sl.Text = "◈  AWAITING INPUT..."
+_sl.TextColor3 = Color3.fromRGB(60,60,120)
+_sl.TextSize = 11
+_sl.Font = Enum.Font.Code
+_sl.TextXAlignment = Enum.TextXAlignment.Left
+_sl.TextTruncate = Enum.TextTruncate.AtEnd
+Instance.new("\85\73\67\111\114\110\101\114",_sl).CornerRadius = UDim.new(0,6)
+local _sls = Instance.new("\85\73\83\116\114\111\107\101",_sl)
+_sls.Color = Color3.fromRGB(20,20,45)
+_sls.Thickness = 1
+
+-- Input Label
+local _il = Instance.new("\84\101\120\116\76\97\98\101\108",_fr)
+_il.Size = UDim2.new(1,-24,0,14)
+_il.Position = UDim2.new(0,14,0,88)
+_il.BackgroundTransparency = 1
+_il.Text = "// SOUND_ID"
+_il.TextColor3 = Color3.fromRGB(40,40,80)
+_il.TextSize = 10
+_il.Font = Enum.Font.Code
+_il.TextXAlignment = Enum.TextXAlignment.Left
+
+-- Input Box
+local _ib = Instance.new("\84\101\120\116\66\111\120",_fr)
+_ib.Size = UDim2.new(1,-24,0,34)
+_ib.Position = UDim2.new(0,12,0,104)
+_ib.BackgroundColor3 = Color3.fromRGB(5,5,12)
+_ib.BorderSizePixel = 0
+_ib.Text = ""
+_ib.PlaceholderText = "0x00000000000000"
+_ib.PlaceholderColor3 = Color3.fromRGB(25,25,50)
+_ib.TextColor3 = Color3.fromRGB(100,100,200)
+_ib.TextSize = 13
+_ib.Font = Enum.Font.Code
+_ib.ClearTextOnFocus = false
+Instance.new("\85\73\67\111\114\110\101\114",_ib).CornerRadius = UDim.new(0,6)
+local _ibs = Instance.new("\85\73\83\116\114\111\107\101",_ib)
+_ibs.Color = Color3.fromRGB(25,25,55)
+_ibs.Thickness = 1
+
+-- Play Button
+local _pb = Instance.new("\84\101\120\116\66\117\116\116\111\110",_fr)
+_pb.Size = UDim2.new(1,-24,0,36)
+_pb.Position = UDim2.new(0,12,0,148)
+_pb.BackgroundColor3 = Color3.fromRGB(10,10,22)
+_pb.Text = "▶  EXECUTE"
+_pb.TextColor3 = Color3.fromRGB(80,80,160)
+_pb.TextSize = 13
+_pb.Font = Enum.Font.Code
+_pb.BorderSizePixel = 0
+Instance.new("\85\73\67\111\114\110\101\114",_pb).CornerRadius = UDim.new(0,8)
+local _pbs = Instance.new("\85\73\83\116\114\111\107\101",_pb)
+_pbs.Color = Color3.fromRGB(25,25,55)
+_pbs.Thickness = 1
+
+-- tag parented ใน frame
+_tag.Parent = _fr
+
+-- ===============================
+-- Drag GUI หลัก (Title Bar ลาก)
+-- ===============================
+local _dr, _ds, _dp = false, nil, nil
+_tb.InputBegan:Connect(function(i)
+    if i.UserInputType == Enum.UserInputType.MouseButton1 or
+       i.UserInputType == Enum.UserInputType.Touch then
+        _dr = true; _ds = i.Position; _dp = _fr.Position
+    end
+end)
+UserInputService.InputChanged:Connect(function(i)
+    if _dr and (i.UserInputType == Enum.UserInputType.MouseMovement or
+                i.UserInputType == Enum.UserInputType.Touch) then
+        local d = i.Position - _ds
+        _fr.Position = UDim2.new(_dp.X.Scale,_dp.X.Offset+d.X,_dp.Y.Scale,_dp.Y.Offset+d.Y)
+    end
+end)
+UserInputService.InputEnded:Connect(function(i)
+    if i.UserInputType == Enum.UserInputType.MouseButton1 or
+       i.UserInputType == Enum.UserInputType.Touch then _dr = false end
+end)
+
+-- ===============================
+-- Drag ปุ่ม Toggle (ลากได้อิสระ)
+-- ===============================
+local _tdr, _tds, _tdp = false, nil, nil
+local _moved = false
+
+_tg.InputBegan:Connect(function(i)
+    if i.UserInputType == Enum.UserInputType.MouseButton1 or
+       i.UserInputType == Enum.UserInputType.Touch then
+        _tdr = true
+        _tds = i.Position
+        _tdp = _tg.Position
+        _moved = false
+    end
+end)
+UserInputService.InputChanged:Connect(function(i)
+    if _tdr and (i.UserInputType == Enum.UserInputType.MouseMovement or
+                 i.UserInputType == Enum.UserInputType.Touch) then
+        local d = i.Position - _tds
+        if math.abs(d.X) > 4 or math.abs(d.Y) > 4 then
+            _moved = true
+        end
+        _tg.Position = UDim2.new(
+            _tdp.X.Scale, _tdp.X.Offset + d.X,
+            _tdp.Y.Scale, _tdp.Y.Offset + d.Y
+        )
+    end
+end)
+UserInputService.InputEnded:Connect(function(i)
+    if i.UserInputType == Enum.UserInputType.MouseButton1 or
+       i.UserInputType == Enum.UserInputType.Touch then
+        _tdr = false
+    end
+end)
+
+-- ===============================
+-- ดึงชื่อเพลง
+-- ===============================
+_ib:GetPropertyChangedSignal("\84\101\120\116"):Connect(function()
+    local id = _ib.Text
+    if #id > 5 then
+        _sl.Text = "⏳  FETCHING..."
+        _sl.TextColor3 = Color3.fromRGB(60,60,120)
+        task.spawn(function()
+            local ok, info = pcall(function()
+                return MarketplaceService:GetProductInfo(tonumber(id))
+            end)
+            if ok and info then
+                _sl.Text = "◈  " .. (info.Name or "UNKNOWN")
+                _sl.TextColor3 = Color3.fromRGB(40,180,100)
+            else
+                _sl.Text = "◈  NOT FOUND"
+                _sl.TextColor3 = Color3.fromRGB(160,40,40)
+            end
+        end)
+    else
+        _sl.Text = "◈  AWAITING INPUT..."
+        _sl.TextColor3 = Color3.fromRGB(60,60,120)
+    end
+end)
+
+-- ===============================
+-- Play (ส่งแค่ BoomBox Remote)
+-- ===============================
+_pb.MouseButton1Click:Connect(function()
+    local id = _ib.Text
+    if id == "" then
+        _pb.Text = "⚠  NO INPUT"
+        _pb.TextColor3 = Color3.fromRGB(180,40,40)
+        task.wait(1.5)
+        _pb.Text = "▶  EXECUTE"
+        _pb.TextColor3 = Color3.fromRGB(80,80,160)
+        return
+    end
+
+    -- BoomBox: Junk Prefix + urlencode(ID จริง) + Junk Suffix
+    local payload = _buildPayload(id)
+    _reB:FireServer(D[15], payload, true)
+
+    _pb.Text = "■  PLAYING..."
+    _pb.TextColor3 = Color3.fromRGB(40,180,100)
+    _pbs.Color = Color3.fromRGB(20,80,40)
+    TweenService:Create(_pb,TweenInfo.new(0.1),{BackgroundColor3=Color3.fromRGB(8,20,12)}):Play()
+    task.wait(0.15)
+    TweenService:Create(_pb,TweenInfo.new(0.1),{BackgroundColor3=Color3.fromRGB(10,10,22)}):Play()
+end)
+
+-- ===============================
+-- Toggle Open (ปุ่ม ♪ กดเปิด GUI)
+-- ===============================
+_tg.MouseButton1Click:Connect(function()
+    if _moved then return end
+    _fr.Size = UDim2.new(0,0,0,0)
+    _fr.Position = UDim2.new(0.5,0,0.5,0)
+    _fr.Visible = true
+    _tg.Visible = false
+    TweenService:Create(_fr, TweenInfo.new(0.25, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
+        Size = UDim2.new(0,300,0,220),
+        Position = UDim2.new(0.5,-150,0.5,-105)
+    }):Play()
+end)
+
+-- ===============================
+-- Close (กากบาทมุมขวาบนของ GUI)
+-- ===============================
+_cb.MouseButton1Click:Connect(function()
+    local cx = _fr.Position.X.Scale
+    local cy = _fr.Position.Y.Scale
+    local ox = _fr.Position.X.Offset + 150
+    local oy = _fr.Position.Y.Offset + 105
+    TweenService:Create(_fr, TweenInfo.new(0.2, Enum.EasingStyle.Back, Enum.EasingDirection.In), {
+        Size = UDim2.new(0,0,0,0),
+        Position = UDim2.new(cx, ox, cy, oy)
+    }):Play()
+    task.wait(0.25)
+    _fr.Visible = false
+    _tg.Visible = true
+end)
