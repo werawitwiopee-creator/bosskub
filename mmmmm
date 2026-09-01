@@ -1,0 +1,297 @@
+-- Loadstring Hook GUI
+-- ใช้ใน Executor เท่านั้น
+
+local Players = game:GetService("Players")
+local UserInputService = game:GetService("UserInputService")
+local LocalPlayer = Players.LocalPlayer
+local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
+
+if PlayerGui:FindFirstChild("HookGui") then
+    PlayerGui.HookGui:Destroy()
+end
+
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "HookGui"
+ScreenGui.ResetOnSpawn = false
+ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+ScreenGui.Parent = PlayerGui
+
+-- ฟังก์ชัน Drag รองรับทั้ง PC และมือถือ
+local function makeDraggable(frame)
+    local dragging = false
+    local dragStart = nil
+    local startPos = nil
+
+    local function onInputBegan(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1
+        or input.UserInputType == Enum.UserInputType.Touch then
+            dragging = true
+            dragStart = input.Position
+            startPos = frame.Position
+            input.Changed:Connect(function()
+                if input.UserInputState == Enum.UserInputState.End then
+                    dragging = false
+                end
+            end)
+        end
+    end
+
+    local function onInputChanged(input)
+        if dragging and dragStart and startPos then
+            if input.UserInputType == Enum.UserInputType.MouseMovement
+            or input.UserInputType == Enum.UserInputType.Touch then
+                local delta = input.Position - dragStart
+                frame.Position = UDim2.new(
+                    startPos.X.Scale, startPos.X.Offset + delta.X,
+                    startPos.Y.Scale, startPos.Y.Offset + delta.Y
+                )
+            end
+        end
+    end
+
+    frame.InputBegan:Connect(onInputBegan)
+    UserInputService.InputChanged:Connect(onInputChanged)
+end
+
+-- ===== ปุ่มเปิด/ปิด (ลากได้อิสระ) =====
+local ToggleBtn = Instance.new("TextButton")
+ToggleBtn.Size = UDim2.new(0, 44, 0, 44)
+ToggleBtn.Position = UDim2.new(0.5, -22, 0.5, -22)
+ToggleBtn.BackgroundColor3 = Color3.fromRGB(80, 120, 220)
+ToggleBtn.Text = "🔗"
+ToggleBtn.TextSize = 20
+ToggleBtn.Font = Enum.Font.GothamBold
+ToggleBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+ToggleBtn.BorderSizePixel = 0
+ToggleBtn.ZIndex = 10
+ToggleBtn.Parent = ScreenGui
+Instance.new("UICorner", ToggleBtn).CornerRadius = UDim.new(0, 12)
+
+makeDraggable(ToggleBtn)
+
+-- ===== Main Frame =====
+local MainFrame = Instance.new("Frame")
+MainFrame.Size = UDim2.new(0, 420, 0, 360)
+MainFrame.Position = UDim2.new(0.5, -210, 0.5, -160)
+MainFrame.BackgroundColor3 = Color3.fromRGB(18, 18, 24)
+MainFrame.BorderSizePixel = 0
+MainFrame.Visible = false
+MainFrame.Parent = ScreenGui
+Instance.new("UICorner", MainFrame).CornerRadius = UDim.new(0, 10)
+
+-- Toggle เปิด/ปิด MainFrame
+ToggleBtn.Activated:Connect(function()
+    MainFrame.Visible = not MainFrame.Visible
+    ToggleBtn.Text = MainFrame.Visible and "✕" or "🔗"
+    ToggleBtn.BackgroundColor3 = MainFrame.Visible
+        and Color3.fromRGB(180, 60, 60)
+        or Color3.fromRGB(80, 120, 220)
+end)
+
+-- Title Bar
+local TitleBar = Instance.new("Frame")
+TitleBar.Size = UDim2.new(1, 0, 0, 36)
+TitleBar.BackgroundColor3 = Color3.fromRGB(30, 30, 40)
+TitleBar.BorderSizePixel = 0
+TitleBar.Parent = MainFrame
+Instance.new("UICorner", TitleBar).CornerRadius = UDim.new(0, 10)
+
+local TitleFix = Instance.new("Frame")
+TitleFix.Size = UDim2.new(1, 0, 0.5, 0)
+TitleFix.Position = UDim2.new(0, 0, 0.5, 0)
+TitleFix.BackgroundColor3 = Color3.fromRGB(30, 30, 40)
+TitleFix.BorderSizePixel = 0
+TitleFix.Parent = TitleBar
+
+local TitleLabel = Instance.new("TextLabel")
+TitleLabel.Size = UDim2.new(1, -40, 1, 0)
+TitleLabel.Position = UDim2.new(0, 12, 0, 0)
+TitleLabel.BackgroundTransparency = 1
+TitleLabel.Text = "🔗 Loadstring Hook"
+TitleLabel.TextColor3 = Color3.fromRGB(220, 220, 255)
+TitleLabel.TextSize = 14
+TitleLabel.Font = Enum.Font.GothamBold
+TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
+TitleLabel.Parent = TitleBar
+
+-- Drag MainFrame ผ่าน TitleBar
+makeDraggable(MainFrame)
+
+-- URL Label
+local UrlLabel = Instance.new("TextLabel")
+UrlLabel.Size = UDim2.new(1, -24, 0, 18)
+UrlLabel.Position = UDim2.new(0, 12, 0, 46)
+UrlLabel.BackgroundTransparency = 1
+UrlLabel.Text = "URL เป้าหมาย"
+UrlLabel.TextColor3 = Color3.fromRGB(160, 160, 200)
+UrlLabel.TextSize = 12
+UrlLabel.Font = Enum.Font.Gotham
+UrlLabel.TextXAlignment = Enum.TextXAlignment.Left
+UrlLabel.Parent = MainFrame
+
+-- URL Input
+local UrlBox = Instance.new("TextBox")
+UrlBox.Size = UDim2.new(1, -24, 0, 34)
+UrlBox.Position = UDim2.new(0, 12, 0, 66)
+UrlBox.BackgroundColor3 = Color3.fromRGB(28, 28, 38)
+UrlBox.Text = "https://kuki.ffpoygg.workers.dev/"
+UrlBox.TextColor3 = Color3.fromRGB(200, 200, 255)
+UrlBox.PlaceholderText = "ใส่ URL ที่นี่..."
+UrlBox.PlaceholderColor3 = Color3.fromRGB(100, 100, 140)
+UrlBox.TextSize = 12
+UrlBox.Font = Enum.Font.Code
+UrlBox.BorderSizePixel = 0
+UrlBox.ClearTextOnFocus = false
+UrlBox.Parent = MainFrame
+Instance.new("UICorner", UrlBox).CornerRadius = UDim.new(0, 6)
+Instance.new("UIPadding", UrlBox).PaddingLeft = UDim.new(0, 8)
+
+-- Console Label
+local ConsoleLabel = Instance.new("TextLabel")
+ConsoleLabel.Size = UDim2.new(1, -24, 0, 18)
+ConsoleLabel.Position = UDim2.new(0, 12, 0, 110)
+ConsoleLabel.BackgroundTransparency = 1
+ConsoleLabel.Text = "Console output"
+ConsoleLabel.TextColor3 = Color3.fromRGB(160, 160, 200)
+ConsoleLabel.TextSize = 12
+ConsoleLabel.Font = Enum.Font.Gotham
+ConsoleLabel.TextXAlignment = Enum.TextXAlignment.Left
+ConsoleLabel.Parent = MainFrame
+
+-- Console Box
+local ConsoleBox = Instance.new("ScrollingFrame")
+ConsoleBox.Size = UDim2.new(1, -24, 0, 110)
+ConsoleBox.Position = UDim2.new(0, 12, 0, 130)
+ConsoleBox.BackgroundColor3 = Color3.fromRGB(12, 12, 18)
+ConsoleBox.BorderSizePixel = 0
+ConsoleBox.ScrollBarThickness = 4
+ConsoleBox.CanvasSize = UDim2.new(0, 0, 0, 0)
+ConsoleBox.AutomaticCanvasSize = Enum.AutomaticSize.Y
+ConsoleBox.Parent = MainFrame
+Instance.new("UICorner", ConsoleBox).CornerRadius = UDim.new(0, 6)
+Instance.new("UIListLayout", ConsoleBox).Padding = UDim.new(0, 2)
+Instance.new("UIPadding", ConsoleBox).PaddingLeft = UDim.new(0, 6)
+
+local function addLog(text, color)
+    local line = Instance.new("TextLabel")
+    line.Size = UDim2.new(1, -8, 0, 0)
+    line.AutomaticSize = Enum.AutomaticSize.Y
+    line.BackgroundTransparency = 1
+    line.Text = text
+    line.TextColor3 = color or Color3.fromRGB(180, 220, 180)
+    line.TextSize = 11
+    line.Font = Enum.Font.Code
+    line.TextXAlignment = Enum.TextXAlignment.Left
+    line.TextWrapped = true
+    line.Parent = ConsoleBox
+end
+
+addLog("รอโค้ดที่ถูกดัก...", Color3.fromRGB(120, 120, 160))
+
+-- Buttons
+local RunBtn = Instance.new("TextButton")
+RunBtn.Size = UDim2.new(0.48, -6, 0, 34)
+RunBtn.Position = UDim2.new(0, 12, 0, 252)
+RunBtn.BackgroundColor3 = Color3.fromRGB(80, 120, 220)
+RunBtn.Text = "▶ รัน Hook"
+RunBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+RunBtn.TextSize = 13
+RunBtn.Font = Enum.Font.GothamBold
+RunBtn.BorderSizePixel = 0
+RunBtn.Parent = MainFrame
+Instance.new("UICorner", RunBtn).CornerRadius = UDim.new(0, 6)
+
+local ClearBtn = Instance.new("TextButton")
+ClearBtn.Size = UDim2.new(0.48, -6, 0, 34)
+ClearBtn.Position = UDim2.new(0.5, 6, 0, 252)
+ClearBtn.BackgroundColor3 = Color3.fromRGB(60, 60, 80)
+ClearBtn.Text = "🗑 ล้าง Log"
+ClearBtn.TextColor3 = Color3.fromRGB(200, 200, 220)
+ClearBtn.TextSize = 13
+ClearBtn.Font = Enum.Font.GothamBold
+ClearBtn.BorderSizePixel = 0
+ClearBtn.Parent = MainFrame
+Instance.new("UICorner", ClearBtn).CornerRadius = UDim.new(0, 6)
+
+-- Copy Button
+local hookedCode = ""
+local CopyBtn = Instance.new("TextButton")
+CopyBtn.Size = UDim2.new(1, -24, 0, 34)
+CopyBtn.Position = UDim2.new(0, 12, 0, 294)
+CopyBtn.BackgroundColor3 = Color3.fromRGB(40, 120, 80)
+CopyBtn.Text = "📋 คัดลอกโค้ด"
+CopyBtn.TextColor3 = Color3.fromRGB(180, 255, 200)
+CopyBtn.TextSize = 13
+CopyBtn.Font = Enum.Font.GothamBold
+CopyBtn.BorderSizePixel = 0
+CopyBtn.Parent = MainFrame
+Instance.new("UICorner", CopyBtn).CornerRadius = UDim.new(0, 6)
+
+-- Status
+local StatusLabel = Instance.new("TextLabel")
+StatusLabel.Size = UDim2.new(1, -24, 0, 20)
+StatusLabel.Position = UDim2.new(0, 12, 0, 334)
+StatusLabel.BackgroundTransparency = 1
+StatusLabel.Text = "สถานะ: รอการใช้งาน"
+StatusLabel.TextColor3 = Color3.fromRGB(120, 120, 160)
+StatusLabel.TextSize = 11
+StatusLabel.Font = Enum.Font.Gotham
+StatusLabel.TextXAlignment = Enum.TextXAlignment.Left
+StatusLabel.Parent = MainFrame
+
+-- Hook Logic
+RunBtn.Activated:Connect(function()
+    local url = UrlBox.Text
+    if url == "" then
+        StatusLabel.Text = "สถานะ: ❌ ใส่ URL ก่อน!"
+        StatusLabel.TextColor3 = Color3.fromRGB(220, 80, 80)
+        return
+    end
+
+    StatusLabel.Text = "สถานะ: ⏳ กำลังรัน..."
+    StatusLabel.TextColor3 = Color3.fromRGB(220, 180, 60)
+
+    local old_ls = loadstring
+    getgenv().loadstring = function(code)
+        hookedCode = code
+        addLog("[Hook] ดักได้! ความยาว: " .. #code .. " ตัวอักษร", Color3.fromRGB(100, 220, 140))
+        local chunkSize = 500
+        for i = 1, #code, chunkSize do
+            addLog(string.sub(code, i, i + chunkSize - 1), Color3.fromRGB(180, 180, 220))
+        end
+        return old_ls(code)
+    end
+
+    local ok, err = pcall(function()
+        loadstring(game:HttpGet(url))()
+    end)
+
+    if ok then
+        StatusLabel.Text = "สถานะ: ✅ รันสำเร็จ"
+        StatusLabel.TextColor3 = Color3.fromRGB(80, 220, 120)
+    else
+        StatusLabel.Text = "สถานะ: ❌ Error!"
+        StatusLabel.TextColor3 = Color3.fromRGB(220, 80, 80)
+        addLog("[Error] " .. tostring(err), Color3.fromRGB(220, 100, 100))
+    end
+end)
+
+ClearBtn.Activated:Connect(function()
+    for _, v in pairs(ConsoleBox:GetChildren()) do
+        if v:IsA("TextLabel") then v:Destroy() end
+    end
+    addLog("ล้าง log แล้ว", Color3.fromRGB(120, 120, 160))
+    StatusLabel.Text = "สถานะ: รอการใช้งาน"
+    StatusLabel.TextColor3 = Color3.fromRGB(120, 120, 160)
+end)
+
+CopyBtn.Activated:Connect(function()
+    if hookedCode == "" then
+        StatusLabel.Text = "สถานะ: ❌ ยังไม่มีโค้ด!"
+        StatusLabel.TextColor3 = Color3.fromRGB(220, 80, 80)
+        return
+    end
+    setclipboard(hookedCode)
+    StatusLabel.Text = "สถานะ: ✅ คัดลอกแล้ว!"
+    StatusLabel.TextColor3 = Color3.fromRGB(80, 220, 120)
+end)
